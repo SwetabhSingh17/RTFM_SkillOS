@@ -56,7 +56,7 @@ export default function LoginPage() {
               <GraduationCap className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-2xl tracking-tight">SkillOS</h1>
+              <h1 className="font-bold text-2xl tracking-tight">RTFM_SkillOS</h1>
               <p className="text-xs text-slate-400 tracking-wider uppercase">AI-Enabled Learning Platform</p>
             </div>
           </div>
@@ -103,12 +103,12 @@ export default function LoginPage() {
             <div className="h-10 w-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center">
               <GraduationCap className="h-6 w-6 text-white" />
             </div>
-            <span className="font-bold text-xl text-slate-900">SkillOS</span>
+            <span className="font-bold text-xl text-slate-900">RTFM_SkillOS</span>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-200 p-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
-            <p className="text-slate-500 text-sm mb-8">Sign in to your SkillOS account</p>
+            <p className="text-slate-500 text-sm mb-8">Sign in to your RTFM_SkillOS account</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>

@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session middleware
 app.use(session({
-  secret: process.env.SESSION_SECRET || "skillos-dev-secret",
+  secret: process.env.SESSION_SECRET || "rtfm_skillos-dev-secret",
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -71,7 +71,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`\n🚀 SkillOS Server running on port ${PORT}`);
+  console.log(`\n🚀 RTFM_SkillOS Server running on port ${PORT}`);
   console.log(`📡 AI Endpoint: ${process.env.OPENAI_BASE_URL || "http://localhost:1234/v1"}`);
   console.log(`🤖 AI Model: ${process.env.LLM_MODEL || "local-model"}`);
   console.log(`📁 Upload Storage: ${process.env.UPLOAD_STORAGE_TYPE || "local"}\n`);

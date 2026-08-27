@@ -1,6 +1,6 @@
-# Simple Installation Guide for SkillOS Portal
+# Simple Installation Guide for RTFM_SkillOS Portal
 
-Welcome! Don't worry if you aren't super technical—this guide is written to help anyone easily start up the SkillOS platform on their computer, whether you use Windows, Mac, or Linux.
+Welcome! Don't worry if you aren't super technical—this guide is written to help anyone easily start up the RTFM_SkillOS platform on their computer, whether you use Windows, Mac, or Linux.
 
 ---
 
@@ -22,16 +22,16 @@ This runs the smart AI on your computer so no private data is sent to the intern
 4. Inside LM Studio, search for **"gemma-2-2b"**, **"qwen"**, **"llama"**, or **"granite"** (a small, fast AI) and click Download.
 5. Once downloaded, go to the **Local Server** tab (looks like a double-arrow icon `↔` on the left).
 6. Select your downloaded model at the top, and click the green **"Start Server"** button. Leave this window open in the background!
-*(Note: The SkillOS AI Engine is smart enough to auto-detect whatever model you currently have loaded in LM Studio, so feel free to experiment!)*
+*(Note: The RTFM_SkillOS AI Engine is smart enough to auto-detect whatever model you currently have loaded in LM Studio, so feel free to experiment!)*
 
 ---
 
 ## 2. Starting the Project
 
-Now that you have Node.js and the AI running, let's start the actual SkillOS website! We have created automated scripts to make this incredibly easy.
+Now that you have Node.js and the AI running, let's start the actual RTFM_SkillOS website! We have created automated scripts to make this incredibly easy.
 
 ### Step 1: Open the Project Folder
-Open the folder where you saved the SkillOS project on your computer.
+Open the folder where you saved the RTFM_SkillOS project on your computer.
 
 ### Step 2: Run the Startup Script
 - **Windows**: Just double-click the `start_server.bat` file.
@@ -43,7 +43,7 @@ Open the folder where you saved the SkillOS project on your computer.
 Once the terminal says the servers are running, open your web browser (like Google Chrome or Safari) and go to this address:
 **`http://localhost:5173`**
 
-You should now see the SkillOS Learner Dashboard!
+You should now see the RTFM_SkillOS Learner Dashboard!
 
 ---
 

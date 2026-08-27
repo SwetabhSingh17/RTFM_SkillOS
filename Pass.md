@@ -1,4 +1,4 @@
-# SkillOS — Demo Account Credentials
+# RTFM_SkillOS — Demo Account Credentials
 
 > **⚠️ These are demo credentials for development and hackathon demonstration only.**  
 > In production, use proper password hashing (bcrypt) and secure credential management.

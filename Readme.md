@@ -1,8 +1,8 @@
-# SkillOS Portal
+# RTFM_SkillOS Portal
 
 **AI-Enabled Learning Platform for India's Official Statistical System**
 
-Welcome to the SkillOS Portal! This project is developed for the Smart India Hackathon (SIH 2026 - Problem 26101). It is designed to act as a smart, AI-driven learning management system specifically tailored to the Ministry of Statistics and Programme Implementation (MoSPI).
+Welcome to the RTFM_SkillOS Portal! This project is developed for the Smart India Hackathon (SIH 2026 - Problem 26101). It is designed to act as a smart, AI-driven learning management system specifically tailored to the Ministry of Statistics and Programme Implementation (MoSPI).
 
 ## What it does
 - **Competency Gap Analysis**: Automatically evaluates user profiles to find skill gaps.

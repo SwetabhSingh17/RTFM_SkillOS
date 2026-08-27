@@ -1,6 +1,6 @@
 @echo off
 echo =========================================
-echo       SkillOS - Setup and Start
+echo       RTFM_SkillOS - Setup and Start
 echo =========================================
 
 echo.
@@ -27,8 +27,8 @@ cd ..
 
 echo.
 echo Starting servers in new windows...
-start cmd /k "title SkillOS Backend && cd server && npm run dev"
-start cmd /k "title SkillOS Frontend && cd client && npm run dev"
+start cmd /k "title RTFM_SkillOS Backend && cd server && npm run dev"
+start cmd /k "title RTFM_SkillOS Frontend && cd client && npm run dev"
 
 echo Done! The servers are now running.
 pause

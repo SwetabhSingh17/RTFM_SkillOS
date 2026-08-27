@@ -134,7 +134,7 @@ export default function AIChatbox() {
             <Sparkles className="h-4 w-4 text-orange-400" />
           </div>
           <div>
-            <h3 className="text-white font-semibold text-sm">SkillOS Assistant</h3>
+            <h3 className="text-white font-semibold text-sm">RTFM_SkillOS Assistant</h3>
             <p className="text-blue-200 text-[10px] flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Local AI Ready
             </p>

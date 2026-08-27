@@ -1,6 +1,6 @@
-# Contributing to SkillOS Portal
+# Contributing to RTFM_SkillOS Portal
 
-First off, thank you for considering contributing to the SkillOS Portal! It's people like you that make this project such a great tool.
+First off, thank you for considering contributing to the RTFM_SkillOS Portal! It's people like you that make this project such a great tool.
 
 ## How Can I Contribute?
 

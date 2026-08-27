@@ -125,7 +125,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
             <GraduationCap className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg tracking-tight">SkillOS</h1>
+            <h1 className="font-bold text-lg tracking-tight">RTFM_SkillOS</h1>
             <p className="text-[10px] text-slate-400 tracking-wider uppercase">AI Learning Platform</p>
           </div>
           <button onClick={onClose} className="ml-auto lg:hidden p-1 hover:bg-white/10 rounded">
@@ -197,7 +197,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="flex items-center justify-center h-screen">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-500 text-sm">Loading SkillOS...</p>
+          <p className="text-slate-500 text-sm">Loading RTFM_SkillOS...</p>
         </div>
       </div>
     );
@@ -224,7 +224,7 @@ function AppLayout() {
           </button>
           <div className="flex items-center gap-2">
             <GraduationCap className="h-6 w-6 text-orange-500" />
-            <span className="font-bold text-slate-900">SkillOS</span>
+            <span className="font-bold text-slate-900">RTFM_SkillOS</span>
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">

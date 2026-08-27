@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "========================================="
-echo "      SkillOS - Setup and Start"
+echo "      RTFM_SkillOS - Setup and Start"
 echo "========================================="
 
 echo ""

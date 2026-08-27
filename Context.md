@@ -1,4 +1,4 @@
-# AI Context for SkillOS Portal (SIH 2026 - Problem 26101)
+# AI Context for RTFM_SkillOS Portal (SIH 2026 - Problem 26101)
 
 ## Project Overview
 This project is an AI-Enabled Learning Platform for India's Official Statistical System (MoSPI). It evaluates existing competencies, identifies skill gaps, and recommends personalized learning pathways (via iGOT Karmayogi integration).

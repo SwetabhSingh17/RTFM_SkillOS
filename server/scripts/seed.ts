@@ -7,7 +7,7 @@ function hashPassword(password: string): string {
 }
 
 async function seed() {
-  console.log("🌱 Seeding database for SkillOS...\n");
+  console.log("🌱 Seeding database for RTFM_SkillOS...\n");
 
   // 1. Seed Competency Domains
   console.log("📊 Seeding Competency Domains...");
