@@ -185,7 +185,7 @@ export const api = {
               if (parsed.content) {
                 yield { type: "content", content: String(parsed.content) };
               }
-            } catch (e) {
+            } catch {
               // Ignore incomplete JSON chunks (though unlikely with SSE)
             }
           }
