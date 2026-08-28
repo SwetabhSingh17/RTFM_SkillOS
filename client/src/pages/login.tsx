@@ -1,7 +1,25 @@
-import { useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Eye, EyeOff, Loader2, Shield, BookOpen, Brain, BarChart3 } from 'lucide-react';
 import { useAuth } from '../App';
+
+const FEATURE_CARDS = [
+  { icon: Brain, label: "AI-Powered Assessment", desc: "Intelligent competency gap analysis" },
+  { icon: BookOpen, label: "iGOT Integration", desc: "Karmayogi course recommendations" },
+  { icon: Shield, label: "Secure & Scalable", desc: "Government-grade security" },
+  { icon: BarChart3, label: "Analytics Dashboard", desc: "Workforce intelligence insights" },
+] as const;
+
+const QUICK_LOGIN_ACCOUNTS = [
+  { label: "Admin", user: "admin", pass: "admin123", color: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100" },
+  { label: "Coordinator", user: "coordinator", pass: "coord123", color: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" },
+  { label: "Trainer", user: "trainer", pass: "train123", color: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" },
+  { label: "Learner", user: "learner", pass: "learn123", color: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100" },
+] as const;
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -11,35 +29,31 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const usernameInputId = useId();
+  const passwordInputId = useId();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      await login(username, password);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const quickLogin = async (user: string, pass: string) => {
-    setUsername(user);
-    setPassword(pass);
+  const authenticate = useCallback(async (user: string, pass: string) => {
     setError('');
     setLoading(true);
     try {
       await login(user, pass);
       navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Login failed. Please check your credentials.'));
     } finally {
       setLoading(false);
     }
+  }, [login, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await authenticate(username, password);
+  };
+
+  const quickLogin = async (user: string, pass: string) => {
+    setUsername(user);
+    setPassword(pass);
+    await authenticate(user, pass);
   };
 
   return (
@@ -74,13 +88,8 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 grid grid-cols-2 gap-4">
-          {[
-            { icon: Brain, label: "AI-Powered Assessment", desc: "Intelligent competency gap analysis" },
-            { icon: BookOpen, label: "iGOT Integration", desc: "Karmayogi course recommendations" },
-            { icon: Shield, label: "Secure & Scalable", desc: "Government-grade security" },
-            { icon: BarChart3, label: "Analytics Dashboard", desc: "Workforce intelligence insights" },
-          ].map((item, i) => (
-            <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
+          {FEATURE_CARDS.map((item) => (
+            <div key={item.label} className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
               <item.icon className="h-5 w-5 text-orange-400 mb-2" />
               <p className="text-sm font-medium">{item.label}</p>
               <p className="text-xs text-slate-400 mt-0.5">{item.desc}</p>
@@ -112,8 +121,9 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
+                <label htmlFor={usernameInputId} className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
                 <input
+                  id={usernameInputId}
                   type="text"
                   value={username}
                   onChange={e => setUsername(e.target.value)}
@@ -124,9 +134,10 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+                <label htmlFor={passwordInputId} className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
                 <div className="relative">
                   <input
+                    id={passwordInputId}
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -137,6 +148,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -145,7 +157,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl border border-red-100">
+                <div role="alert" aria-live="assertive" className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl border border-red-100">
                   {error}
                 </div>
               )}
@@ -168,14 +180,10 @@ export default function LoginPage() {
           <div className="mt-6">
             <p className="text-xs text-slate-400 text-center mb-3">Quick Demo Login</p>
             <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: "Admin", user: "admin", pass: "admin123", color: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100" },
-                { label: "Coordinator", user: "coordinator", pass: "coord123", color: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" },
-                { label: "Trainer", user: "trainer", pass: "train123", color: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" },
-                { label: "Learner", user: "learner", pass: "learn123", color: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100" },
-              ].map((acc) => (
+              {QUICK_LOGIN_ACCOUNTS.map((acc) => (
                 <button
                   key={acc.user}
+                  type="button"
                   onClick={() => quickLogin(acc.user, acc.pass)}
                   className={`px-3 py-2.5 rounded-xl text-xs font-medium border transition-colors ${acc.color}`}
                 >

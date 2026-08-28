@@ -1,9 +1,8 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   BookOpen, GraduationCap, LayoutDashboard, Brain, Target, BarChart3,
-  FileText, LogOut, User, ChevronRight, Menu, X, MessageCircle, Sparkles,
-  Library, Settings
+  FileText, LogOut, ChevronRight, Menu, X, Library
 } from 'lucide-react';
 import { api } from './lib/api';
 import { cn } from './lib/utils';
@@ -99,7 +98,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const navItems = getNavItems(user?.role || "student");
+  const navItems = useMemo(() => getNavItems(user?.role || "student"), [user?.role]);
 
   const handleLogout = async () => {
     await logout();
@@ -110,7 +109,12 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
     <>
       {/* Mobile overlay */}
       {open && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          onClick={onClose}
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        />
       )}
       <aside
         className={cn(
@@ -128,13 +132,18 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
             <h1 className="font-bold text-lg tracking-tight">RTFM_SkillOS</h1>
             <p className="text-[10px] text-slate-400 tracking-wider uppercase">AI Learning Platform</p>
           </div>
-          <button onClick={onClose} className="ml-auto lg:hidden p-1 hover:bg-white/10 rounded">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close navigation menu"
+            className="ml-auto lg:hidden p-1 hover:bg-white/10 rounded"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-thin">
+        <nav aria-label="Primary navigation" className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-thin">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(item.path));
             return (
@@ -142,6 +151,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
                 key={item.path}
                 to={item.path}
                 onClick={onClose}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
                   isActive
@@ -170,6 +180,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
               </div>
             </div>
             <button
+              type="button"
               onClick={handleLogout}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
@@ -219,7 +230,12 @@ function AppLayout() {
       <div className="flex-1 flex flex-col min-h-screen lg:ml-0">
         {/* Mobile header */}
         <header className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200 sticky top-0 z-30">
-          <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-slate-100 rounded-lg">
+          <button
+            type="button"
+            aria-label="Open navigation menu"
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 hover:bg-slate-100 rounded-lg"
+          >
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-2">

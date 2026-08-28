@@ -1,12 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { MessageCircle, X, Send, Bot, User, Sparkles, Minimize2 } from 'lucide-react';
 import { api } from '../lib/api';
 import { cn } from '../lib/utils';
 import { useLocation } from 'react-router-dom';
 
 interface Message {
+  id: number;
   role: 'user' | 'assistant';
   content: string;
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
 }
 
 export default function AIChatbox() {
@@ -16,38 +21,48 @@ export default function AIChatbox() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const nextMessageIdRef = useRef(1);
   const location = useLocation();
+
+  const createMessage = useCallback((role: Message['role'], content: string): Message => ({
+    id: nextMessageIdRef.current++,
+    role,
+    content,
+  }), []);
 
   // Show a welcome message when opened for the first time
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      setMessages([
-        { role: 'assistant', content: 'Hello! I am your AI learning assistant for the India Official Statistical System. I can answer questions about survey design, national accounts, iGOT courses, or explain quiz results. How can I help you today?' }
-      ]);
+    if (isOpen) {
+      setMessages((previousMessages) => (
+        previousMessages.length === 0
+          ? [createMessage('assistant', 'Hello! I am your AI learning assistant for the India Official Statistical System. I can answer questions about survey design, national accounts, iGOT courses, or explain quiz results. How can I help you today?')]
+          : previousMessages
+      ));
     }
-  }, [isOpen]);
+  }, [createMessage, isOpen]);
 
   // Contextual hint based on route
-  const getContextHint = () => {
+  const contextHint = useMemo(() => {
     if (location.pathname.includes('/quiz')) return "Ask me to explain a quiz concept.";
     if (location.pathname.includes('/competency')) return "Ask me how to improve a specific skill gap.";
     if (location.pathname.includes('/courses')) return "Ask me for a course recommendation.";
     return "Ask me anything about official statistics...";
-  };
+  }, [location.pathname]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, loading]);
+  }, [messages, loading, scrollToBottom]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || loading) return;
+    const trimmedInput = input.trim();
+    if (!trimmedInput || loading) return;
 
-    const userMessage = { role: 'user' as const, content: input.trim() };
+    const userMessage = createMessage('user', trimmedInput);
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
@@ -76,12 +91,16 @@ export default function AIChatbox() {
         setMessages(prev => {
           const newMessages = [...prev];
           const lastMsg = newMessages[newMessages.length - 1];
+          if (!lastMsg) return newMessages;
           if (lastMsg && lastMsg.role === 'user') {
             // First chunk: add the assistant message
-            newMessages.push({ role: 'assistant', content: currentResponse });
+            newMessages.push(createMessage('assistant', currentResponse));
           } else {
             // Subsequent chunks: update the assistant message
-            newMessages[newMessages.length - 1] = { role: 'assistant', content: currentResponse };
+            newMessages[newMessages.length - 1] = {
+              ...lastMsg,
+              content: currentResponse,
+            };
           }
           return newMessages;
         });
@@ -91,15 +110,21 @@ export default function AIChatbox() {
           isFirstChunk = false;
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setMessages(prev => {
         const newMessages = [...prev];
+        const fallback = 'Failed to connect to local AI model. Ensure LM Studio/Ollama is running.';
+        const errorMessage = getErrorMessage(err, fallback);
         // If we haven't started streaming, push a new error message.
-        if (newMessages[newMessages.length - 1].role === 'user') {
-          newMessages.push({ role: 'assistant', content: `Error: ${err.message || 'Failed to connect to local AI model. Ensure LM Studio/Ollama is running.'}` });
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage?.role === 'user') {
+          newMessages.push(createMessage('assistant', `Error: ${errorMessage}`));
         } else {
           // Otherwise append to the streaming message
-          newMessages[newMessages.length - 1].content += `\n\nError: ${err.message}`;
+          newMessages[newMessages.length - 1] = {
+            ...lastMessage,
+            content: `${lastMessage?.content || ''}\n\nError: ${errorMessage}`.trim(),
+          };
         }
         return newMessages;
       });
@@ -111,6 +136,8 @@ export default function AIChatbox() {
   if (!isOpen) {
     return (
       <button
+        type="button"
+        aria-label="Open AI assistant chat"
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 h-14 w-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-500/30 hover:scale-105 transition-transform z-50 group"
       >
@@ -120,15 +147,16 @@ export default function AIChatbox() {
   }
 
   return (
-    <div className={cn(
+    <div
+      role="dialog"
+      aria-label="AI assistant chat"
+      className={cn(
       "fixed right-4 sm:right-6 bottom-4 sm:bottom-6 w-[calc(100vw-2rem)] sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 flex flex-col overflow-hidden transition-all duration-300",
       isMinimized ? "h-14" : "h-[600px] max-h-[85vh]"
-    )}>
+    )}
+    >
       {/* Header */}
-      <div 
-        className="bg-gradient-to-r from-[#0F204C] to-[#1a3366] p-4 flex justify-between items-center cursor-pointer select-none"
-        onClick={() => setIsMinimized(!isMinimized)}
-      >
+      <div className="bg-gradient-to-r from-[#0F204C] to-[#1a3366] p-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center">
             <Sparkles className="h-4 w-4 text-orange-400" />
@@ -141,13 +169,18 @@ export default function AIChatbox() {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button 
+          <button
+            type="button"
+            aria-label={isMinimized ? "Expand chat window" : "Minimize chat window"}
+            onClick={() => setIsMinimized((previousState) => !previousState)}
             className="p-1.5 text-blue-200 hover:text-white hover:bg-white/10 rounded"
           >
             <Minimize2 className="h-4 w-4" />
           </button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+          <button
+            type="button"
+            aria-label="Close AI assistant chat"
+            onClick={() => setIsOpen(false)}
             className="p-1.5 text-blue-200 hover:text-white hover:bg-white/10 rounded"
           >
             <X className="h-4 w-4" />
@@ -158,9 +191,9 @@ export default function AIChatbox() {
       {!isMinimized && (
         <>
           {/* Chat Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 scrollbar-thin">
-            {messages.map((msg, i) => (
-              <div key={i} className={cn("flex gap-3 max-w-[85%]", msg.role === 'user' ? "ml-auto flex-row-reverse" : "")}>
+          <section aria-live="polite" aria-label="Chat messages" className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 scrollbar-thin">
+            {messages.map((msg) => (
+              <div key={msg.id} className={cn("flex gap-3 max-w-[85%]", msg.role === 'user' ? "ml-auto flex-row-reverse" : "")}>
                 <div className={cn(
                   "h-8 w-8 rounded-full flex items-center justify-center shrink-0",
                   msg.role === 'user' ? "bg-slate-200 text-slate-600" : "bg-orange-100 text-orange-600"
@@ -178,7 +211,7 @@ export default function AIChatbox() {
               </div>
             ))}
             {loading && (
-              <div className="flex gap-3 max-w-[85%]">
+              <div className="flex gap-3 max-w-[85%]" role="status" aria-label="Assistant is generating a response">
                 <div className="h-8 w-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center shrink-0">
                   <Bot className="h-4 w-4" />
                 </div>
@@ -188,21 +221,26 @@ export default function AIChatbox() {
               </div>
             )}
             <div ref={messagesEndRef} />
-          </div>
+          </section>
 
           {/* Input Area */}
           <div className="p-3 bg-white border-t border-slate-200">
             <form onSubmit={handleSubmit} className="relative">
+              <label htmlFor="ai-chat-input" className="sr-only">
+                Message the AI assistant
+              </label>
               <input
+                id="ai-chat-input"
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={getContextHint()}
+                placeholder={contextHint}
                 className="w-full bg-slate-100 border-transparent focus:bg-white focus:border-orange-300 focus:ring-2 focus:ring-orange-100 rounded-xl pl-4 pr-12 py-3 text-sm transition-all"
                 disabled={loading}
               />
               <button
                 type="submit"
+                aria-label="Send message"
                 disabled={!input.trim() || loading}
                 className="absolute right-1.5 top-1.5 bottom-1.5 bg-[#0F204C] text-white p-2 rounded-lg hover:bg-[#1a3366] disabled:opacity-50 transition-colors"
               >
