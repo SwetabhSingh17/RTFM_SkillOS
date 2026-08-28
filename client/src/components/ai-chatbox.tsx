@@ -8,6 +8,7 @@ interface Message {
   id: number;
   role: 'user' | 'assistant';
   content: string;
+  thinking?: string;
 }
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -18,6 +19,7 @@ export default function AIChatbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [expandedThinkingByMessage, setExpandedThinkingByMessage] = useState<Record<number, boolean>>({});
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -82,11 +84,17 @@ export default function AIChatbox() {
         }
       }
         
-      let currentResponse = '';
+      let assistantMessageId: number | null = null;
       let isFirstChunk = true;
       
       for await (const chunk of api.chatStream(chatHistory)) {
-        currentResponse += chunk;
+        if (chunk.type === 'done') break;
+        if (chunk.type === 'error') {
+          throw new Error(chunk.error);
+        }
+        if (chunk.type !== 'content' && chunk.type !== 'reasoning') {
+          continue;
+        }
         
         setMessages(prev => {
           const newMessages = [...prev];
@@ -102,6 +110,8 @@ export default function AIChatbox() {
               content: currentResponse,
             };
           }
+          newMessages[assistantIndex] = assistantMessage;
+
           return newMessages;
         });
         
@@ -206,7 +216,33 @@ export default function AIChatbox() {
                     ? "bg-[#0F204C] text-white rounded-tr-sm" 
                     : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm"
                 )}>
-                  {msg.content}
+                  <div>{msg.content || (msg.thinking ? 'Generating answer...' : '')}</div>
+                  {msg.role === 'assistant' && msg.thinking?.trim() && (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedThinkingByMessage(prev => ({ ...prev, [msg.id]: !prev[msg.id] }))}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700"
+                      >
+                        {expandedThinkingByMessage[msg.id] ? (
+                          <>
+                            <ChevronUp className="h-3 w-3" />
+                            Hide Thinking
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-3 w-3" />
+                            Show Thinking
+                          </>
+                        )}
+                      </button>
+                      {expandedThinkingByMessage[msg.id] && (
+                        <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-600 whitespace-pre-wrap">
+                          {msg.thinking}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

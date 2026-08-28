@@ -16,6 +16,12 @@ import type {
 
 const API_BASE = "/api";
 
+export type ChatStreamEvent =
+  | { type: "content"; content: string }
+  | { type: "reasoning"; content: string }
+  | { type: "done" }
+  | { type: "error"; error: string };
+
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${url}`, {
     headers: {
@@ -134,7 +140,7 @@ export const api = {
   chat: (messages: { role: string; content: string }[]) =>
     request<{ response: string }>("/chat", { method: "POST", body: JSON.stringify({ messages }) }),
 
-  chatStream: async function*(messages: { role: string; content: string }[]) {
+  chatStream: async function*(messages: { role: string; content: string }[]): AsyncGenerator<ChatStreamEvent> {
     const res = await fetch(`${API_BASE}/chat/stream`, {
       method: "POST",
       headers: { 
@@ -164,7 +170,10 @@ export const api = {
         for (const part of parts) {
           if (part.startsWith("data: ")) {
             const dataStr = part.slice(6);
-            if (dataStr === "[DONE]") return;
+            if (dataStr === "[DONE]") {
+              yield { type: "done" };
+              return;
+            }
             try {
               const parsed = JSON.parse(dataStr);
               if (parsed.error) throw new Error(parsed.error);
