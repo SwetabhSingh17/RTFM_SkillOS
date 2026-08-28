@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import { useState, useEffect, createContext, useContext, useMemo, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   BookOpen, GraduationCap, LayoutDashboard, Brain, Target, BarChart3,
@@ -6,29 +6,21 @@ import {
 } from 'lucide-react';
 import { api } from './lib/api';
 import { cn } from './lib/utils';
+import type { AuthUser } from './lib/types';
 
 // Pages
-import Dashboard from './pages/learner-dashboard';
-import QuizGenerator from './pages/quiz-generator';
-import CompetencyProfile from './pages/competency-profile';
-import CourseCatalog from './pages/course-catalog';
-import QuizTake from './pages/quiz-take';
-import QuizResults from './pages/quiz-results';
-import AdminAnalytics from './pages/admin-analytics';
-import LearningPaths from './pages/learning-paths';
-import LoginPage from './pages/login';
-import AIChatbox from './components/ai-chatbox';
+const Dashboard = lazy(() => import('./pages/learner-dashboard'));
+const QuizGenerator = lazy(() => import('./pages/quiz-generator'));
+const CompetencyProfile = lazy(() => import('./pages/competency-profile'));
+const CourseCatalog = lazy(() => import('./pages/course-catalog'));
+const QuizTake = lazy(() => import('./pages/quiz-take'));
+const QuizResults = lazy(() => import('./pages/quiz-results'));
+const AdminAnalytics = lazy(() => import('./pages/admin-analytics'));
+const LearningPaths = lazy(() => import('./pages/learning-paths'));
+const LoginPage = lazy(() => import('./pages/login'));
+const AIChatbox = lazy(() => import('./components/ai-chatbox'));
 
 // Auth Context
-interface AuthUser {
-  id: number;
-  username: string;
-  name: string;
-  email: string;
-  role: string;
-  organization: string;
-}
-
 interface AuthContextType {
   user: AuthUser | null;
   login: (username: string, password: string) => Promise<void>;
@@ -204,14 +196,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-slate-500 text-sm">Loading RTFM_SkillOS...</p>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!user) {
@@ -219,6 +204,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-12 w-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-slate-500 text-sm">Loading RTFM_SkillOS...</p>
+      </div>
+    </div>
+  );
 }
 
 function AppLayout() {
@@ -244,20 +240,24 @@ function AppLayout() {
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/competency-profile" element={<CompetencyProfile />} />
-            <Route path="/learning-paths" element={<LearningPaths />} />
-            <Route path="/courses" element={<CourseCatalog />} />
-            <Route path="/quizzes" element={<QuizTake />} />
-            <Route path="/quiz/generate" element={<QuizGenerator />} />
-            <Route path="/quiz/:id/results" element={<QuizResults />} />
-            <Route path="/admin/analytics" element={<AdminAnalytics />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/competency-profile" element={<CompetencyProfile />} />
+              <Route path="/learning-paths" element={<LearningPaths />} />
+              <Route path="/courses" element={<CourseCatalog />} />
+              <Route path="/quizzes" element={<QuizTake />} />
+              <Route path="/quiz/generate" element={<QuizGenerator />} />
+              <Route path="/quiz/:id/results" element={<QuizResults />} />
+              <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
       {/* AI Chatbox - floating */}
-      <AIChatbox />
+      <Suspense fallback={null}>
+        <AIChatbox />
+      </Suspense>
     </div>
   );
 }
@@ -266,17 +266,19 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   );

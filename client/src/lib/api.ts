@@ -1,3 +1,19 @@
+import type {
+  AuthUser,
+  CompetencyFramework,
+  CompetencyGapsResponse,
+  CompetencyProfileResponse,
+  Course,
+  Enrollment,
+  LearnerAnalytics,
+  LearningMaterial,
+  LearningPath,
+  Quiz,
+  QuizDetails,
+  QuizGenerateResponse,
+  WorkforceAnalytics,
+} from "./types";
+
 const API_BASE = "/api";
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -21,13 +37,13 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 export const api = {
   // Auth
   login: (username: string, password: string) =>
-    request<{ success: boolean; user: any }>("/auth/login", {
+    request<{ success: boolean; user: AuthUser }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ username, password }),
     }),
 
-  register: (data: any) =>
-    request<{ success: boolean; user: any }>("/auth/register", {
+  register: (data: Record<string, unknown>) =>
+    request<{ success: boolean; user: AuthUser }>("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     }),
@@ -36,26 +52,34 @@ export const api = {
     request<{ success: boolean }>("/auth/logout", { method: "POST" }),
 
   getMe: () =>
-    request<{ user: any }>("/auth/me"),
+    request<{ user: AuthUser }>("/auth/me"),
 
   // Health
-  health: () => request<any>("/health"),
+  health: () => request<Record<string, unknown>>("/health"),
 
   // Competencies
-  getFrameworks: () => request<any[]>("/competencies/frameworks"),
-  getCompetencyProfile: (userId: number) => request<any>(`/competencies/profile/${userId}`),
-  submitAssessment: (data: any) =>
-    request<any>("/competencies/assess", { method: "POST", body: JSON.stringify(data) }),
-  getGaps: (userId: number) => request<any>(`/competencies/gaps/${userId}`),
-  saveProfile: (data: any) =>
-    request<any>("/competencies/profile", { method: "POST", body: JSON.stringify(data) }),
+  getFrameworks: () => request<CompetencyFramework[]>("/competencies/frameworks"),
+  getCompetencyProfile: (userId: number) => request<CompetencyProfileResponse>(`/competencies/profile/${userId}`),
+  submitAssessment: (data: {
+    userId: number;
+    assessments: Array<{
+      competencyItemId: number;
+      currentLevel: number;
+      targetLevel: number;
+      priority: string;
+    }>;
+  }) =>
+    request<{ success: boolean }>("/competencies/assess", { method: "POST", body: JSON.stringify(data) }),
+  getGaps: (userId: number) => request<CompetencyGapsResponse>(`/competencies/gaps/${userId}`),
+  saveProfile: (data: Record<string, unknown>) =>
+    request<{ success: boolean; message?: string }>("/competencies/profile", { method: "POST", body: JSON.stringify(data) }),
 
   // Learning Paths
-  getLearningPaths: (userId: number) => request<any[]>(`/learning-paths/${userId}`),
-  generateLearningPath: (data: any) =>
-    request<any>("/learning-paths/generate", { method: "POST", body: JSON.stringify(data) }),
+  getLearningPaths: (userId: number) => request<LearningPath[]>(`/learning-paths/${userId}`),
+  generateLearningPath: (data: { userId: number; gaps: CompetencyGapsResponse["gaps"]; preferences: Record<string, unknown> }) =>
+    request<{ success: boolean; path: LearningPath }>("/learning-paths/generate", { method: "POST", body: JSON.stringify(data) }),
   updatePathStep: (pathId: number, stepId: number, status: string) =>
-    request<any>(`/learning-paths/${pathId}/steps/${stepId}`, {
+    request<{ success: boolean }>(`/learning-paths/${pathId}/steps/${stepId}`, {
       method: "PUT",
       body: JSON.stringify({ status }),
     }),
@@ -63,27 +87,27 @@ export const api = {
   // iGOT Courses
   getCourses: (params?: Record<string, string>) => {
     const query = params ? "?" + new URLSearchParams(params).toString() : "";
-    return request<any[]>(`/igot/courses${query}`);
+    return request<Course[]>(`/igot/courses${query}`);
   },
-  getCourseDetails: (id: number) => request<any>(`/igot/courses/${id}`),
+  getCourseDetails: (id: number) => request<Course>(`/igot/courses/${id}`),
   enrollCourse: (userId: number, courseId: number) =>
-    request<any>("/igot/enroll", { method: "POST", body: JSON.stringify({ userId, courseId }) }),
-  getEnrollments: (userId: number) => request<any[]>(`/igot/enrollments/${userId}`),
+    request<{ success: boolean }>("/igot/enroll", { method: "POST", body: JSON.stringify({ userId, courseId }) }),
+  getEnrollments: (userId: number) => request<Enrollment[]>(`/igot/enrollments/${userId}`),
 
   // Quiz
   generateQuiz: (data: { materialId: number; difficulty: string; numberOfQuestions: number }) =>
-    request<any>("/quiz/generate", { method: "POST", body: JSON.stringify(data) }),
-  getQuizzes: () => request<any[]>("/quiz"),
-  getQuiz: (id: number) => request<any>(`/quiz/${id}`),
+    request<QuizGenerateResponse>("/quiz/generate", { method: "POST", body: JSON.stringify(data) }),
+  getQuizzes: () => request<Quiz[]>("/quiz"),
+  getQuiz: (id: number) => request<QuizDetails>(`/quiz/${id}`),
   startAttempt: (quizId: number, userId: number) =>
-    request<any>(`/quiz/${quizId}/attempt`, { method: "POST", body: JSON.stringify({ userId }) }),
-  submitAttempt: (attemptId: number, data: any) =>
-    request<any>(`/quiz/attempts/${attemptId}`, { method: "PUT", body: JSON.stringify(data) }),
-  getAttemptResults: (attemptId: number) => request<any>(`/quiz/attempts/${attemptId}`),
+    request<Record<string, unknown>>(`/quiz/${quizId}/attempt`, { method: "POST", body: JSON.stringify({ userId }) }),
+  submitAttempt: (attemptId: number, data: Record<string, unknown>) =>
+    request<Record<string, unknown>>(`/quiz/attempts/${attemptId}`, { method: "PUT", body: JSON.stringify(data) }),
+  getAttemptResults: (attemptId: number) => request<Record<string, unknown>>(`/quiz/attempts/${attemptId}`),
 
   // Materials
-  getMaterials: () => request<any[]>("/materials"),
-  getMaterial: (id: number) => request<any>(`/materials/${id}`),
+  getMaterials: () => request<LearningMaterial[]>("/materials"),
+  getMaterial: (id: number) => request<LearningMaterial>(`/materials/${id}`),
   uploadMaterial: async (file: File, title: string, userId: number) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -96,15 +120,15 @@ export const api = {
       credentials: "include",
     });
     if (!res.ok) throw new Error("Upload failed");
-    return res.json();
+    return res.json() as Promise<{ success: boolean; material: LearningMaterial }>;
   },
   processMaterial: (id: number) =>
-    request<any>(`/materials/${id}/process`, { method: "POST" }),
+    request<{ success: boolean; extractedText: string }>(`/materials/${id}/process`, { method: "POST" }),
 
   // Analytics
-  getLearnerAnalytics: (userId: number) => request<any>(`/analytics/learner/${userId}`),
-  getWorkforceAnalytics: () => request<any>("/analytics/workforce"),
-  getQuizPerformance: () => request<any>("/analytics/quiz-performance"),
+  getLearnerAnalytics: (userId: number) => request<LearnerAnalytics>(`/analytics/learner/${userId}`),
+  getWorkforceAnalytics: () => request<WorkforceAnalytics>("/analytics/workforce"),
+  getQuizPerformance: () => request<Record<string, unknown>>("/analytics/quiz-performance"),
 
   // AI Chat
   chat: (messages: { role: string; content: string }[]) =>
@@ -145,7 +169,7 @@ export const api = {
               const parsed = JSON.parse(dataStr);
               if (parsed.error) throw new Error(parsed.error);
               if (parsed.content) yield parsed.content;
-            } catch (e) {
+            } catch {
               // Ignore incomplete JSON chunks (though unlikely with SSE)
             }
           }
