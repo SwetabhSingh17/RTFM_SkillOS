@@ -1,28 +1,39 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Sparkles, Minimize2 } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Sparkles, Minimize2, ChevronDown, ChevronUp } from 'lucide-react';
 import { api } from '../lib/api';
 import { cn } from '../lib/utils';
 import { useLocation } from 'react-router-dom';
 
 interface Message {
+  id: number;
   role: 'user' | 'assistant';
   content: string;
+  thinking?: string;
 }
 
 export default function AIChatbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [expandedThinkingByMessage, setExpandedThinkingByMessage] = useState<Record<number, boolean>>({});
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const nextMessageIdRef = useRef(1);
   const location = useLocation();
+
+  const createMessage = (role: 'user' | 'assistant', content: string, thinking?: string): Message => ({
+    id: nextMessageIdRef.current++,
+    role,
+    content,
+    thinking,
+  });
 
   // Show a welcome message when opened for the first time
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setMessages([
-        { role: 'assistant', content: 'Hello! I am your AI learning assistant for the India Official Statistical System. I can answer questions about survey design, national accounts, iGOT courses, or explain quiz results. How can I help you today?' }
+        createMessage('assistant', 'Hello! I am your AI learning assistant for the India Official Statistical System. I can answer questions about survey design, national accounts, iGOT courses, or explain quiz results. How can I help you today?')
       ]);
     }
   }, [isOpen]);
@@ -47,7 +58,7 @@ export default function AIChatbox() {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    const userMessage = { role: 'user' as const, content: input.trim() };
+    const userMessage = createMessage('user', input.trim());
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setLoading(true);
@@ -67,22 +78,39 @@ export default function AIChatbox() {
         }
       }
         
-      let currentResponse = '';
+      let assistantMessageId: number | null = null;
       let isFirstChunk = true;
       
       for await (const chunk of api.chatStream(chatHistory)) {
-        currentResponse += chunk;
+        if (chunk.type === 'done') break;
+        if (chunk.type === 'error') {
+          throw new Error(chunk.error);
+        }
+        if (chunk.type !== 'content' && chunk.type !== 'reasoning') {
+          continue;
+        }
         
         setMessages(prev => {
           const newMessages = [...prev];
-          const lastMsg = newMessages[newMessages.length - 1];
-          if (lastMsg && lastMsg.role === 'user') {
-            // First chunk: add the assistant message
-            newMessages.push({ role: 'assistant', content: currentResponse });
-          } else {
-            // Subsequent chunks: update the assistant message
-            newMessages[newMessages.length - 1] = { role: 'assistant', content: currentResponse };
+          let assistantIndex = assistantMessageId === null
+            ? -1
+            : newMessages.findIndex(m => m.id === assistantMessageId);
+
+          if (assistantIndex === -1) {
+            const newAssistant = createMessage('assistant', '');
+            assistantMessageId = newAssistant.id;
+            newMessages.push(newAssistant);
+            assistantIndex = newMessages.length - 1;
           }
+
+          const assistantMessage = { ...newMessages[assistantIndex] };
+          if (chunk.type === 'content') {
+            assistantMessage.content += chunk.content;
+          } else {
+            assistantMessage.thinking = (assistantMessage.thinking || '') + chunk.content;
+          }
+          newMessages[assistantIndex] = assistantMessage;
+
           return newMessages;
         });
         
@@ -95,11 +123,13 @@ export default function AIChatbox() {
       setMessages(prev => {
         const newMessages = [...prev];
         // If we haven't started streaming, push a new error message.
-        if (newMessages[newMessages.length - 1].role === 'user') {
-          newMessages.push({ role: 'assistant', content: `Error: ${err.message || 'Failed to connect to local AI model. Ensure LM Studio/Ollama is running.'}` });
+        if (newMessages[newMessages.length - 1]?.role === 'user') {
+          newMessages.push(createMessage('assistant', `Error: ${err.message || 'Failed to connect to local AI model. Ensure LM Studio/Ollama is running.'}`));
         } else {
           // Otherwise append to the streaming message
-          newMessages[newMessages.length - 1].content += `\n\nError: ${err.message}`;
+          const lastMessage = { ...newMessages[newMessages.length - 1] };
+          lastMessage.content += `\n\nError: ${err.message}`;
+          newMessages[newMessages.length - 1] = lastMessage;
         }
         return newMessages;
       });
@@ -173,7 +203,33 @@ export default function AIChatbox() {
                     ? "bg-[#0F204C] text-white rounded-tr-sm" 
                     : "bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm"
                 )}>
-                  {msg.content}
+                  <div>{msg.content || (msg.thinking ? 'Generating answer...' : '')}</div>
+                  {msg.role === 'assistant' && msg.thinking?.trim() && (
+                    <div className="mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedThinkingByMessage(prev => ({ ...prev, [msg.id]: !prev[msg.id] }))}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700"
+                      >
+                        {expandedThinkingByMessage[msg.id] ? (
+                          <>
+                            <ChevronUp className="h-3 w-3" />
+                            Hide Thinking
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="h-3 w-3" />
+                            Show Thinking
+                          </>
+                        )}
+                      </button>
+                      {expandedThinkingByMessage[msg.id] && (
+                        <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-600 whitespace-pre-wrap">
+                          {msg.thinking}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
