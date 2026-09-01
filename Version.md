@@ -8,6 +8,7 @@
 - **Automated Startup Scripts**: Added `start_server.bat` (Windows) and `start_server.sh` (Mac/Linux) to handle dual concurrent installation and server launching.
 - **UI Enhancements**: Made the main navigation sidebar sticky (`h-screen`) to prevent the user profile and logout buttons from scrolling out of view, and updated the AI Chatbox with a blinking "Thinking..." animation.
 - **Concurrency Bug Fixes**: Fixed a critical React state batching bug that caused user prompts to be overwritten by the assistant during fast streaming initializations.
+- **Context-Aware Chat**: The AI assistant now implicitly understands the user's current page context by injecting the route data directly into the system prompt.
 
 ## [v1.0.0-alpha] - SIH 2026 Prototype
 

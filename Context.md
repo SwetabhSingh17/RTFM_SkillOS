@@ -14,6 +14,7 @@ This project is an AI-Enabled Learning Platform for India's Official Statistical
 2. **Personalized Learning Paths**: Recommends iGOT courses and NSSTA TPAC trainings based on detected gaps.
 3. **AI Assessment Engine**: Generates MCQs and quizzes from uploaded learning materials (PDF/DOCX) using local LLMs.
 4. **Dashboards**: Separate views for Learners, Trainers, and Admins to track learning hours, competency progress, and organization-wide metrics.
+5. **Context-Aware AI Assistant**: A globally available chat agent that understands the user's active page route (e.g., competencies, courses, or quizzes) to provide highly contextual answers.
 
 ## Important Design Decisions
 - The project was migrated from an older Academic Project Management System (APMS). Academic tables were dropped in favor of competency frameworks.

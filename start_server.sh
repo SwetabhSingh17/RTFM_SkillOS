@@ -1,8 +1,13 @@
 #!/bin/bash
 
-echo "========================================="
-echo "      RTFM_SkillOS - Setup and Start"
-echo "========================================="
+echo =============================================
+echo       R.T.F.M._SkillOS - Setup and Start
+echo                Developed By
+echo                Swetabh Singh
+echo                Mantasha Khan
+echo                Rimsha Khan
+echo                Hashmat Zahra
+echo =============================================
 
 echo ""
 echo "[1/2] Installing backend dependencies..."

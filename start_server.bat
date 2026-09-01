@@ -1,5 +1,13 @@
 @echo off
 setlocal EnableDelayedExpansion
+echo =============================================
+echo       R.T.F.M._SkillOS - Setup and Start
+echo                Developed By
+echo                Swetabh Singh
+echo                Mantasha Khan
+echo                Rimsha Khan
+echo                Hashmat Zahra
+echo =============================================
 
 title RTFM SkillOS Setup & Launcher
 

@@ -88,7 +88,12 @@ export default function AIChatbox() {
         .filter(m => !m.content.includes("I'm currently unable to connect to the AI model"));
         
       // Collapse consecutive messages of the same role (prevents LM Studio prompt template crashes)
-      const chatHistory: { role: string; content: string }[] = [];
+      const chatHistory: { role: string; content: string }[] = [
+        { 
+          role: 'system', 
+          content: `The user is currently on the '${location.pathname}' page of the application. Use this context to better answer their questions. For example, if they are on /competency, they might be asking about their skill gaps. If on /quiz, they might be asking about assessments. If on /courses, they might be looking for training.`
+        }
+      ];
       for (const m of filtered) {
         if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === m.role) {
           chatHistory[chatHistory.length - 1].content += "\n\n" + m.content;
