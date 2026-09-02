@@ -5,6 +5,11 @@ title RTFM SkillOS Setup & Launcher
 
 echo ========================================================
 echo   🚀 RTFM SkillOS - Automated Setup ^& Start Script 🚀
+echo                Developed By
+echo                Swetabh Singh
+echo                Mantasha Khan
+echo                Rimsha Khan
+echo                Hashmat Zahra
 echo ========================================================
 echo.
 
