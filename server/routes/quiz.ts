@@ -4,10 +4,11 @@ import { contentProcessor } from "../services/contentProcessor";
 import { db } from "../db";
 import { quizzes, quizQuestions, learningMaterials } from "../../shared/schema";
 import { eq } from "drizzle-orm";
+import { requireRoles, ROLES } from "../middleware/rbac";
 
 export const quizRouter = Router();
 
-quizRouter.post("/generate", async (req, res) => {
+quizRouter.post("/generate", requireRoles([ROLES.ADMIN, ROLES.TRAINER, ROLES.HR]), async (req, res) => {
   const { materialId, difficulty, numberOfQuestions } = req.body;
   // Hardcoded for demo/MVP
   const userId = 1;

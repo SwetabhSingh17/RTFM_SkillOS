@@ -30,9 +30,9 @@ Build an AI-enabled learning platform that:
 
 - [x] **Update user roles** for statistical system:
   - `admin` → Platform Admin
-  - `coordinator` → Department Head / Training Coordinator
-  - `supervisor` → Trainer / Mentor
-  - `student` → Learner (Official)
+  - `hr` → Department Head / Training Coordinator
+  - `trainer` → Trainer / Mentor
+  - `learner` → Learner (Official)
 
 - [x] **Add indexes** for competency queries, iGOT course search, quiz lookups
 
@@ -72,6 +72,7 @@ Build an AI-enabled learning platform that:
 - [x] **User Competency Profile Creation**:
   - Auto-populate from user metadata (designation, department, role, experience, qualifications, training history)
   - Manual override capability for admins/trainers
+  - **Cold Start Handling**: Infer an *Estimated Baseline Competency* for new users using Weight Vectors (Education, Role, Dept, Experience). Subtracted from the Target Role Profile to find initial gaps. Hand-off to RTOS upon first user action for self-correction.
 
 - [x] **Gap Analysis Algorithm**:
   - Compare user profile against role-based competency requirements
@@ -147,7 +148,7 @@ Build an AI-enabled learning platform that:
 - [ ] **Learning Hours Tracker** - Weekly/monthly goals
 - [ ] **Achievements/Badges** - Gamification
 
-### 4.2 Administrator Dashboard (Dept Head/Coordinator)
+### 4.2 Administrator Dashboard (Dept Head/HR)
 - [ ] **Workforce Competency Heatmap** - Department/role view
 - [ ] **Training Effectiveness** - Pre/post assessment deltas
 - [ ] **Course Utilization** - iGOT enrollment/completion rates
@@ -180,7 +181,7 @@ Build an AI-enabled learning platform that:
 | Quiz Taking | `/quiz/:id/take` | Learner |
 | Quiz Results | `/quiz/:id/results` | Learner, Trainer |
 | Learner Dashboard | `/dashboard/learner` | Learner |
-| Admin Analytics | `/dashboard/admin` | Admin, Coordinator |
+| Admin Analytics | `/dashboard/admin` | Admin, HR |
 | Trainer Dashboard | `/dashboard/trainer` | Trainer |
 | Material Upload | `/materials/upload` | Trainer, Admin |
 
@@ -188,19 +189,30 @@ Build an AI-enabled learning platform that:
 - [ ] **Sidebar reorganization** by role:
   - Learner: Dashboard, My Profile, Learning Paths, Courses, Quizzes, Progress
   - Trainer: Dashboard, My Learners, Quiz Generator, Materials, Analytics
-  - Coordinator: Dashboard, Department Analytics, Course Management, Reports
+  - HR: Dashboard, Department Analytics, Course Management, Reports
   - Admin: All + System Management, User Management
 
 ---
 
-## Phase 6: Security, Testing & Deployment (Week 5-6)
+## Phase 5.5: RTOS (Real-Time Orchestration System) Integration
+- [x] **Event-Driven Backbone**: Implement WebSocket/Redis queues for asynchronous task management.
+- [x] **Live Competency Sync**: Automatically trigger competency recalculation and dashboard updates upon quiz completion or iGOT webhook events.
+- [x] **Background AI Jobs**: Offload heavy LLM document parsing and quiz generation to background workers to prevent UI blocking.
 
-### 6.1 Security Hardening
-- [ ] **RBAC validation** on all new endpoints
-- [ ] **Input sanitization** for file uploads (XSS prevention)
-- [ ] **API rate limiting** on AI endpoints
-- [ ] **Audit logging** for competency changes, quiz generations
-- [ ] **Data privacy** - PII handling per government guidelines
+---
+
+## Phase 6: Security, Testing & Deployment (Hackathon Prep)
+- [x] Seed Data Generation: 
+  - Mock profiles (Junior, Mid, Senior officials)
+  - Pre-generated skill-gap histories
+- [x] RBAC Implementation: Ensure learners cannot access `/admin` or `/quiz/generate`.
+- [x] Containerization: Write `Dockerfile` and `docker-compose.yml` for Postgres, Redis, Server, and Client.
+- [x] **Security Hardening**:
+  - [x] RBAC validation on all new endpoints
+  - [x] Input sanitization for file uploads (XSS prevention)
+  - [x] API rate limiting on AI endpoints
+  - [x] Audit logging for competency changes, quiz generations
+  - [x] **Data privacy** - PII handling per government guidelines
 
 ### 6.2 Testing Strategy
 - [ ] **Unit tests** - Competency algorithms, quiz generation prompts

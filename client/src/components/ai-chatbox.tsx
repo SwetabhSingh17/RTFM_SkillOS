@@ -87,11 +87,23 @@ export default function AIChatbox() {
       const filtered = [...messages, userMessage]
         .filter(m => !m.content.includes("I'm currently unable to connect to the AI model"));
         
+      // Extract what's visible on screen for better context
+      const mainElement = document.getElementById('main-content');
+      // Limit to 3000 chars to avoid blowing up the context window
+      const screenText = mainElement ? mainElement.innerText.substring(0, 3000) : 'No screen content detected.';
+
       // Collapse consecutive messages of the same role (prevents LM Studio prompt template crashes)
       const chatHistory: { role: string; content: string }[] = [
         { 
           role: 'system', 
-          content: `The user is currently on the '${location.pathname}' page of the application. Use this context to better answer their questions. For example, if they are on /competency, they might be asking about their skill gaps. If on /quiz, they might be asking about assessments. If on /courses, they might be looking for training.`
+          content: `The user is currently on the '${location.pathname}' page of the application. 
+
+Here is the textual representation of what is currently displayed on their screen:
+---
+${screenText}
+---
+
+Use this context to better answer their questions. For example, if they ask "what does this mean?" or "how do I improve my lowest score?", look at the screen text to understand what they are referring to.`
         }
       ];
       for (const m of filtered) {

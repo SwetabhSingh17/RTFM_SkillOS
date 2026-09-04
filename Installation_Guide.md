@@ -6,9 +6,25 @@ We have created an automated script (`start_server.bat`) that will do almost all
 
 ---
 
-## 🛠️ Step 1: Run the Automated Script (The Easy Way)
+## 🐳 Step 1: Run with Docker (The Easiest Way!)
 
-We have created a magic script that does everything automatically!
+If you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed, you can start the entire platform in one command:
+
+1. Open your computer's terminal (search for **cmd** or **PowerShell**) and navigate to the project folder.
+2. Run the following command:
+   ```bash
+   docker compose up -d --build
+   ```
+3. Docker will automatically download the database, cache, and build the website for you.
+4. Once it says "Started", open your web browser and go to `http://localhost:5001`.
+
+*Note: To populate the database with hackathon mock data, you can run `docker compose exec app npm run seed` (or run it locally via `npx tsx scripts/seed.ts` inside the server folder).*
+
+---
+
+## 🛠️ Step 2: Run the Automated Script (The Local Way)
+
+We also have a magic script that does everything automatically on your local machine!
 
 1. Open the folder where you extracted this project.
 2. Double-click the file named **`start_server.bat`**.

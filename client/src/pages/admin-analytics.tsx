@@ -18,7 +18,7 @@ export default function AdminAnalytics() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (user?.role === 'student') {
+  if (user?.role === 'learner') {
     return <Navigate to="/" replace />;
   }
 

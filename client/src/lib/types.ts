@@ -4,7 +4,8 @@ export interface AuthUser {
   name: string;
   email: string;
   role: string;
-  organization: string;
+  organization?: string;
+  onboardingCompleted?: boolean;
 }
 
 export interface LearnerAnalytics {

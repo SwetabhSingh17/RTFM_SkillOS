@@ -6,6 +6,7 @@ import { db } from "../db";
 import { learningMaterials } from "../../shared/schema";
 import { eq } from "drizzle-orm";
 import { contentProcessor } from "../services/contentProcessor";
+import { requireRoles, ROLES } from "../middleware/rbac";
 
 // Configure storage — local filesystem by default, S3 ready
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./uploads";
@@ -52,7 +53,7 @@ const upload = multer({ storage, fileFilter, limits: { fileSize: MAX_SIZE } });
 export const materialsRouter = Router();
 
 // POST /api/materials/upload — Upload file
-materialsRouter.post("/upload", upload.single("file"), async (req, res) => {
+materialsRouter.post("/upload", requireRoles([ROLES.ADMIN, ROLES.TRAINER, ROLES.HR]), upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -157,7 +158,7 @@ materialsRouter.post("/:id/process", async (req, res) => {
 });
 
 // DELETE /api/materials/:id — Remove material
-materialsRouter.delete("/:id", async (req, res) => {
+materialsRouter.delete("/:id", requireRoles([ROLES.ADMIN, ROLES.HR]), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const material = await db.select().from(learningMaterials).where(eq(learningMaterials.id, id)).limit(1);

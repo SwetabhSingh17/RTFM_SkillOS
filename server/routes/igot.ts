@@ -2,8 +2,20 @@ import { Router } from "express";
 import { db } from "../db";
 import { igotCourses, igotEnrollments } from "../../shared/schema";
 import { eq, and, like } from "drizzle-orm";
+import { igotClient } from "../services/igotClient";
 
 export const igotRouter = Router();
+
+// POST /api/igot/sync — Sync catalog from external iGOT
+igotRouter.post("/sync", async (req, res) => {
+  try {
+    const result = await igotClient.syncCatalog();
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to sync iGOT catalog" });
+  }
+});
 
 // GET /api/igot/courses — Search/list iGOT courses
 igotRouter.get("/courses", async (req, res) => {

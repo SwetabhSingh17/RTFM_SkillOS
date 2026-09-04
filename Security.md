@@ -9,6 +9,9 @@ Currently, the RTFM_SkillOS Portal is in the prototype phase for the Smart India
 | 1.0.x   | :white_check_mark: |
 | < 1.0   | :x:                |
 
+### Role-Based Access Control (RBAC)
+The API relies on strict Role-Based Access Control (`rbac.ts` middleware) enforcing that routes like `/api/analytics` and `/api/quiz/generate` can only be hit by authenticated users possessing the `admin`, `hr`, or `trainer` roles.
+
 ## Reporting a Vulnerability
 
 We take the security of government and user data very seriously. Because this project is intended for official use, we ask that you **do not** publicly disclose any security vulnerabilities you may find.

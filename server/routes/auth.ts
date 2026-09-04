@@ -40,7 +40,7 @@ authRouter.post("/register", async (req, res) => {
       password: hashPassword(password),
       name,
       email,
-      role: role || "student",
+      role: role || "learner",
       organization: organization || "MoSPI",
     }).returning();
 
@@ -51,7 +51,7 @@ authRouter.post("/register", async (req, res) => {
 
     res.json({
       success: true,
-      user: { id: user.id, username: user.username, name: user.name, email: user.email, role: user.role, organization: user.organization },
+      user: { id: user.id, username: user.username, name: user.name, email: user.email, role: user.role, organization: user.organization, onboardingCompleted: user.onboardingCompleted },
     });
   } catch (error) {
     console.error(error);
@@ -87,7 +87,7 @@ authRouter.post("/login", async (req, res) => {
 
     res.json({
       success: true,
-      user: { id: user.id, username: user.username, name: user.name, email: user.email, role: user.role, organization: user.organization },
+      user: { id: user.id, username: user.username, name: user.name, email: user.email, role: user.role, organization: user.organization, onboardingCompleted: user.onboardingCompleted },
     });
   } catch (error) {
     console.error(error);
@@ -105,6 +105,23 @@ authRouter.post("/logout", (req, res) => {
   });
 });
 
+// POST /api/auth/complete-onboarding — Mark onboarding as done
+authRouter.post("/complete-onboarding", async (req, res) => {
+  try {
+    const userId = (req as any).session?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    await db.update(users).set({ onboardingCompleted: true }).where(eq(users.id, userId));
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to complete onboarding" });
+  }
+});
+
 // GET /api/auth/me — Get current user
 authRouter.get("/me", async (req, res) => {
   try {
@@ -120,7 +137,7 @@ authRouter.get("/me", async (req, res) => {
 
     const user = userResult[0];
     res.json({
-      user: { id: user.id, username: user.username, name: user.name, email: user.email, role: user.role, organization: user.organization },
+      user: { id: user.id, username: user.username, name: user.name, email: user.email, role: user.role, organization: user.organization, onboardingCompleted: user.onboardingCompleted },
     });
   } catch (error) {
     console.error(error);

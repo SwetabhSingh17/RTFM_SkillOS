@@ -43,7 +43,7 @@ export default function QuizTake() {
           <FileText className="h-12 w-12 mx-auto mb-3 text-slate-300" />
           <h3 className="text-lg font-semibold text-slate-700 mb-1">No Quizzes Available</h3>
           <p className="text-sm text-slate-500 mb-4">Quizzes will appear here once a trainer generates them from uploaded materials.</p>
-          {(user?.role === 'supervisor' || user?.role === 'admin') && (
+          {(user?.role === 'trainer' || user?.role === 'admin') && (
             <button
               onClick={() => navigate('/quiz/generate')}
               className="bg-orange-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-600"
@@ -97,10 +97,10 @@ export default function QuizTake() {
               </div>
 
               <button
-                onClick={() => navigate(`/quiz/${quiz.id}/results`)}
-                className="w-full bg-gradient-to-r from-violet-500 to-violet-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:from-violet-600 hover:to-violet-700 transition-all shadow-sm"
+                onClick={() => navigate(`/quiz/${quiz.id}/session`)}
+                className="w-full bg-[#0F204C] text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#0a1628] transition-all shadow-sm"
               >
-                View Quiz
+                Start Quiz
               </button>
             </div>
           ))}

@@ -3,20 +3,21 @@ import { pgTable, serial, text, integer, boolean, timestamp, json, index } from 
 // --- Enums and Auth ---
 export enum UserRole {
   ADMIN = "admin",
-  COORDINATOR = "coordinator", // Department Head / Training Coordinator
-  SUPERVISOR = "supervisor",  // Trainer / Mentor
-  STUDENT = "student",        // Learner (Official)
+  HR = "hr",           // Department Head / HR / Training Coordinator
+  TRAINER = "trainer", // Trainer / Mentor
+  LEARNER = "learner", // Learner (Official)
 }
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role").notNull().default("student"),
+  role: text("role").notNull().default("learner"),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   organization: text("organization"), // e.g., "MoSPI", "NSO", "DES"
   primaryLanguage: text("primary_language").default("English"),
+  onboardingCompleted: boolean("onboarding_completed").notNull().default(false),
   lastActiveAt: timestamp("last_active_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "../db";
 import { competencyDomains, competencyItems, userCompetencies, userProfiles } from "../../shared/schema";
 import { eq, and } from "drizzle-orm";
+import { competencyService } from "../services/competencyService";
 
 export const competenciesRouter = Router();
 
@@ -148,20 +149,30 @@ competenciesRouter.post("/profile", async (req, res) => {
 
     const existing = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
 
+    let profileData;
     if (existing.length > 0) {
       await db.update(userProfiles).set({
         designation, department, jobRole, currentAssignment,
         educationalQualifications, workExperienceYears, previousTrainings, careerLevel,
         updatedAt: new Date(),
       }).where(eq(userProfiles.userId, userId));
+      profileData = { ...existing[0], designation, department, jobRole, currentAssignment, educationalQualifications, workExperienceYears, previousTrainings, careerLevel };
       res.json({ success: true, message: "Profile updated" });
     } else {
       const inserted = await db.insert(userProfiles).values({
         userId, designation, department, jobRole, currentAssignment,
         educationalQualifications, workExperienceYears, previousTrainings, careerLevel,
       }).returning();
-      res.json({ success: true, profile: inserted[0] });
+      profileData = inserted[0];
+      res.json({ success: true, profile: profileData });
     }
+
+    // Fire-and-forget the Cold Start algorithm in the background
+    // This will calculate competencies for this profile without blocking the HTTP response
+    competencyService.runColdStart(userId, profileData).catch(err => {
+      console.error(`[Cold Start Engine] Background processing failed for user ${userId}:`, err);
+    });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to save profile" });

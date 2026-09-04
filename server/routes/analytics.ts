@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "../db";
 import { users, userCompetencies, competencyDomains, competencyItems, quizAttempts, quizzes, igotEnrollments, igotCourses, learningPaths } from "../../shared/schema";
 import { eq, count, avg, sql } from "drizzle-orm";
+import { requireRoles, ROLES } from "../middleware/rbac";
 
 export const analyticsRouter = Router();
 
@@ -70,7 +71,7 @@ analyticsRouter.get("/learner/:userId", async (req, res) => {
 });
 
 // GET /api/analytics/workforce — Org-wide competency heatmap data
-analyticsRouter.get("/workforce", async (req, res) => {
+analyticsRouter.get("/workforce", requireRoles([ROLES.ADMIN, ROLES.HR]), async (req, res) => {
   try {
     const domains = await db.select().from(competencyDomains);
     const items = await db.select().from(competencyItems);
@@ -106,7 +107,7 @@ analyticsRouter.get("/workforce", async (req, res) => {
     });
 
     // Org stats
-    const totalLearners = allUsers.filter(u => u.role === "student").length;
+    const totalLearners = allUsers.filter(u => u.role === "learner").length;
     const allEnrollments = await db.select().from(igotEnrollments);
     const allAttempts = await db.select().from(quizAttempts);
 

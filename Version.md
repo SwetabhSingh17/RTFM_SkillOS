@@ -1,5 +1,13 @@
 # Version History
 
+## [v1.2.0-beta] - Hackathon Ready (Phase 5 Complete)
+
+### Added
+- **Docker Containerization**: Full multi-stage `Dockerfile` and `docker-compose.yml` for unified deployment of Frontend, Backend, Redis, and Postgres.
+- **Role-Based Access Control (RBAC)**: Added `requireRoles` middleware securing `/api/quiz/generate`, `/api/materials`, and `/api/analytics` endpoints.
+- **Hackathon Seed Data**: Created `server/scripts/seed.ts` containing MoSPI / NSSTA TPAC specific users, courses, and pre-calculated competency gaps for immediate dashboard visualization.
+- **Quiz Taking UI**: Interactive MCQ quiz interface with instant AI feedback evaluation.
+
 ## [v1.1.0-alpha] - AI Engine & UX Polish
 
 ### Added

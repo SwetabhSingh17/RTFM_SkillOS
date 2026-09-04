@@ -65,7 +65,7 @@ export default function Dashboard() {
         <div className="flex gap-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-medium border border-blue-100">
             <Activity className="h-4 w-4" />
-            {user?.role === 'student' ? 'Learner' : user?.role}
+            {user?.role === 'learner' ? 'Learner' : user?.role}
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
             {user?.organization}

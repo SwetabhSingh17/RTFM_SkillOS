@@ -49,7 +49,7 @@ export const api = {
     }),
 
   register: (data: Record<string, unknown>) =>
-    request<{ success: boolean; user: AuthUser }>("/auth/register", {
+    request<{ success: boolean; user: AuthUser }>("/users/register", {
       method: "POST",
       body: JSON.stringify(data),
     }),
@@ -59,6 +59,9 @@ export const api = {
 
   getMe: () =>
     request<{ user: AuthUser }>("/auth/me"),
+
+  completeOnboarding: () =>
+    request<{ success: boolean }>("/auth/complete-onboarding", { method: "POST" }),
 
   // Health
   health: () => request<Record<string, unknown>>("/health"),
@@ -193,5 +196,14 @@ export const api = {
     request<{ explanation: string }>("/chat/explain", {
       method: "POST",
       body: JSON.stringify({ question, userAnswer, correctAnswer }),
+    }),
+
+  // Users (Admin)
+  getUsers: () => request<{ users: AuthUser[] }>("/users"),
+
+  bulkUploadUsers: (users: Record<string, unknown>[]) =>
+    request<{ successCount: number; errorCount: number; errors: any[] }>("/users/bulk-upload", {
+      method: "POST",
+      body: JSON.stringify({ users }),
     }),
 };

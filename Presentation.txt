@@ -1,0 +1,47 @@
+Slide 1: Title Slide
+- Title: AI-Enabled Learning Platform for India's Official Statistical System
+- Subtitle: Smart Education Solution for Capacity Building (SIH Problem Statement 26101)
+- Team Name: [Your Team Name]
+- Organization: MoSPI (Data Informatics & Innovation Division)
+
+Slide 2: The Problem - Challenges in Capacity Building
+- Rapid tech advancement (AI, Big Data, GIS) requires continuous upskilling.
+- iGOT Karmayogi has vast resources, but officials struggle to find relevant courses.
+- No intelligent mechanism for comprehensive skill-gap assessment based on specific job roles.
+- Traditional training lacks personalization and continuous, real-time evaluation.
+
+Slide 3: Our Solution - SkillOS (AI Learning Platform)
+- An AI-powered Learning Management System (LMS) tailored for Official Statistics.
+- Solves the "Cold Start" problem during onboarding by mapping 4 Metadata Vectors (Education, Role, Dept, Experience) to an Estimated Baseline Competency.
+- Conducts automated skill-gap calculation (Target Role Profile minus Estimated Baseline) to generate immediate, targeted initial recommendations.
+- Delivers highly personalized, adaptive learning pathways across 4 domains (Statistical, Technical, Digital Governance, Behavioural).
+
+Slide 4: Key Innovation - Real-Time Orchestration System (RTOS)
+- The "Central Nervous System" of our platform.
+- Event-Driven Backbone: Captures course completions and quiz results instantly.
+- Live Competency Sync: Recalculates skill scores and updates gaps in real-time.
+- Dynamic Dashboards: Pushes updated recommendations directly to the Learner Dashboard via WebSockets without page reloads.
+
+Slide 5: Data & Process Workflow
+- Step 1 (Ingestion): User metadata (role, dept) and learning materials (PDFs, Videos) are ingested.
+- Step 2 (Processing): The AI Engine maps profiles to baselines, while background workers parse documents to generate MCQs.
+- Step 3 (Analysis): The Gap Calculation Engine compares actual scores against Target Job Role requirements.
+- Step 4 (Action): The Semantic Recommender matches these specific gaps against the iGOT/NSSTA course index.
+- Step 5 (Feedback Loop): Once a user completes a task, the RTOS instantly recalculates their score and restarts the cycle.
+
+Slide 6: Seamless Ecosystem Integration
+- Deep integration with iGOT Karmayogi APIs and NSSTA's TPAC.
+- Intelligent Course Matching: Uses semantic search to map identified skill gaps to the exact courses needed.
+- Progress Tracking: Automatically monitors enrollments, learning hours, and updates competency scores upon course completion.
+- Secure & Interoperable: Built with strict Role-Based Access Control (RBAC) and Single Sign-On (SSO) aligned with Government guidelines.
+
+Slide 7: AI-Powered Assessment Engine
+- Automated Quiz Generation: Trainers upload PDFs, PPTXs, or Video transcripts.
+- AI (LLMs/NLP) instantly parses the content, chunks it, and generates objective MCQs.
+- Includes plausible distractors and detailed explanations for self-evaluation.
+- Processed in the background via asynchronous task queues (Redis) so the UI remains fluid.
+
+Slide 8: Impact & Future Readiness
+- For Learners: A clear, customized roadmap to mastering modern statistical and digital skills.
+- For Administrators: Interactive heatmaps, training effectiveness metrics, and predictive analytics for workforce planning.
+- Ultimate Goal: Building a data-driven, future-ready statistical workforce equipped for the evolving needs of India.

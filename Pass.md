@@ -8,7 +8,7 @@
 | Role | Username | Password | Name | Organization | Access Level |
 |------|----------|----------|------|--------------|-------------|
 | **Admin** | `admin` | `admin123` | Dr. Priya Sharma | MoSPI | Full system access, analytics, user management |
-| **Coordinator** | `coordinator` | `coord123` | Anil Verma | MoSPI | Department analytics, course management, reports |
+| **HR** | `hr` | `hr1234` | Anil Verma | MoSPI | Department analytics, course management, reports |
 | **Trainer** | `trainer` | `train123` | Dr. Meena Iyer | NSSTA | Quiz generation, material upload, learner monitoring |
 | **Learner** | `learner` | `learn123` | Rajesh Kumar | MoSPI | Dashboard, courses, quizzes, competency profile |
 
@@ -20,19 +20,19 @@
 - User management and system configuration
 - Can view all departments and learner progress
 
-### Coordinator (Department Head / Training Coordinator)
+### HR (Department Head / Training Coordinator)
 - Department-level analytics and reporting
 - Course recommendation oversight
 - Training programme coordination
 - Can view department learner progress
 
-### Supervisor / Trainer
+### Trainer
 - AI Quiz Generator access
 - Learning material upload and processing
 - Learner performance monitoring
 - Content creation and quiz publishing
 
-### Student / Learner (Official)
+### Learner (Official)
 - Personalized learner dashboard
 - Competency self-assessment
 - iGOT course enrollment

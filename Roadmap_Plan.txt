@@ -1,0 +1,32 @@
+SIH 2026 - AI-Enabled Learning Platform for Official Statistics
+High-Level Roadmap Plan
+
+Phase 1: Foundation & Architecture (Week 1-2)
+- Set up database schemas for competencies, learning paths, and iGOT catalog.
+- Build modular APIs and the core AI Service Layer (LM Studio/Ollama).
+- Implement role-based access for Admin, HR, Trainer, and Learner.
+
+Phase 2: Core Features - Competency & Learning (Week 2-3)
+- Define the 4 domains: Statistical, Technical, Digital Governance, Behavioural.
+- Build New User Onboarding logic to solve the Cold Start problem (Estimated Baseline mapping).
+- Automate User Competency Profiling & AI Gap Analysis.
+- Integrate iGOT Karmayogi APIs for course cataloging and recommendations.
+
+Phase 3: AI-Powered Assessment Engine (Week 3-4)
+- Build text extraction pipeline (PDF, PPTX, Video).
+- Implement LLM prompt engineering to generate MCQs with distractors/explanations.
+- Develop adaptive Quiz Taking interface and performance analytics.
+
+Phase 4: Dashboards & Analytics (Week 4-5)
+- Learner Dashboard: Competency Radar, Learning Paths, Recommended Courses.
+- Admin Dashboard: Workforce Heatmaps, Skill Gap Trends, Resource Allocation.
+- Trainer Dashboard: Cohort tracking and material management.
+
+Phase 5: Real-Time Orchestration (RTOS) & UI/UX (Week 4-5)
+- Implement RTOS: Real-time event triggers for competency updates & background LLM tasks.
+- Migrate UI to MoSPI branding with a modern, responsive design (React/Tailwind).
+
+Phase 6: Security, Testing & Deployment (Week 5-6)
+- Apply RBAC, input sanitization, and API rate limiting.
+- Dockerize the application and set up CI/CD pipelines.
+- Finalize documentation, user guides, and hackathon presentation demo.

@@ -20,6 +20,7 @@ This project is an AI-Enabled Learning Platform for India's Official Statistical
 - The project was migrated from an older Academic Project Management System (APMS). Academic tables were dropped in favor of competency frameworks.
 - The UI uses MoSPI/Government colors (Navy Blue, Saffron, Green) with modern aesthetics (glassmorphism, clean layouts).
 - The AI implementation is designed specifically for **local hosting** (Ollama/LM Studio) due to data privacy constraints. We don't use OpenAI/Anthropic cloud APIs directly, though we use the OpenAI Node.js client configured to point to localhost.
+- **Security & Deployment**: The platform is secured using Role-Based Access Control (RBAC) middleware and containerized using Docker Compose for simple 1-click deployments.
 
 ## Where to find things
 - `shared/schema.ts`: Contains the database schema (competency domains, learning paths, quizzes, iGOT courses, user profiles).

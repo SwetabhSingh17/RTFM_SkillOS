@@ -2,7 +2,7 @@ import { useState, useEffect, createContext, useContext, useMemo, lazy, Suspense
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   BookOpen, GraduationCap, LayoutDashboard, Brain, Target, BarChart3,
-  FileText, LogOut, ChevronRight, Menu, X, Library
+  FileText, LogOut, ChevronRight, Menu, X, Library, Users
 } from 'lucide-react';
 import { api } from './lib/api';
 import { cn } from './lib/utils';
@@ -14,10 +14,14 @@ const QuizGenerator = lazy(() => import('./pages/quiz-generator'));
 const CompetencyProfile = lazy(() => import('./pages/competency-profile'));
 const CourseCatalog = lazy(() => import('./pages/course-catalog'));
 const QuizTake = lazy(() => import('./pages/quiz-take'));
+const QuizSession = lazy(() => import('./pages/quiz-session'));
 const QuizResults = lazy(() => import('./pages/quiz-results'));
 const AdminAnalytics = lazy(() => import('./pages/admin-analytics'));
+const AdminUsers = lazy(() => import('./pages/admin-users'));
 const LearningPaths = lazy(() => import('./pages/learning-paths'));
 const LoginPage = lazy(() => import('./pages/login'));
+const RegisterPage = lazy(() => import('./pages/register'));
+const OnboardingPage = lazy(() => import('./pages/onboarding'));
 const AIChatbox = lazy(() => import('./components/ai-chatbox'));
 
 // Auth Context
@@ -75,11 +79,12 @@ function getNavItems(role: string) {
     { path: "/quizzes", icon: FileText, label: "Quizzes" },
   ];
 
-  if (role === "supervisor" || role === "admin" || role === "coordinator") {
+  if (role === "trainer" || role === "admin" || role === "hr") {
     base.push({ path: "/quiz/generate", icon: Brain, label: "AI Quiz Generator" });
   }
 
-  if (role === "admin" || role === "coordinator") {
+  if (role === "admin" || role === "hr") {
+    base.push({ path: "/admin/users", icon: Users, label: "User Management" });
     base.push({ path: "/admin/analytics", icon: BarChart3, label: "Admin Analytics" });
   }
 
@@ -90,7 +95,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const navItems = useMemo(() => getNavItems(user?.role || "student"), [user?.role]);
+  const navItems = useMemo(() => getNavItems(user?.role || "learner"), [user?.role]);
 
   const handleLogout = async () => {
     await logout();
@@ -117,7 +122,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-6 border-b border-white/10">
-          <div className="h-10 w-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
+          <div className="h-10 w-10 bg-gradient-to-br from-[#FF9933] to-[#e68a2e] rounded-xl flex items-center justify-center shadow-lg shadow-[#FF9933]/20">
             <GraduationCap className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -168,7 +173,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user.name}</p>
-                <p className="text-xs text-slate-400 capitalize">{user.role === "student" ? "Learner" : user.role} • {user.organization}</p>
+                <p className="text-xs text-slate-400 capitalize">{user.role} • {user.organization}</p>
               </div>
             </div>
             <button
@@ -194,6 +199,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return <PageLoader />;
@@ -201,6 +207,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Enforce onboarding for new users, except when they are already on the onboarding page
+  if (user.onboardingCompleted === false && location.pathname !== "/onboarding") {
+    return <Navigate to="/onboarding" replace />;
   }
 
   return <>{children}</>;
@@ -239,17 +250,20 @@ function AppLayout() {
             <span className="font-bold text-slate-900">RTFM_SkillOS</span>
           </div>
         </header>
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <main id="main-content" className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/onboarding" element={<OnboardingPage />} />
               <Route path="/competency-profile" element={<CompetencyProfile />} />
               <Route path="/learning-paths" element={<LearningPaths />} />
               <Route path="/courses" element={<CourseCatalog />} />
               <Route path="/quizzes" element={<QuizTake />} />
+              <Route path="/quiz/:id/session" element={<QuizSession />} />
               <Route path="/quiz/generate" element={<QuizGenerator />} />
               <Route path="/quiz/:id/results" element={<QuizResults />} />
               <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/users" element={<AdminUsers />} />
             </Routes>
           </Suspense>
         </main>
@@ -269,6 +283,7 @@ function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route
               path="/*"
               element={
